@@ -3,21 +3,14 @@
 unsigned char g_map[3999];
 unsigned int g_mapw, g_maph;
 
-const char g_dirs4[] = {
+const char g_dirs[] = {
   0, -1,
   1, 0,
   0, 1,
   -1, 0,
-};
-
-const char g_dirs8[] = {
-  0, -1,
   1, -1,
-  1, 0,
   1, 1,
-  0, 1,
   -1, 1,
-  -1, 0,
   -1, -1,
 };
 
@@ -27,12 +20,10 @@ bool inMapBounds(int x, int y) {
 
 bool tileBlocks(int t) {
     switch(t) {
-    case 1:
-    case 3:
-    case 5:
-      return true;
+    case 1: case 2: case 4: case 5:
+        return true;
     default:
-      return false;
+        return false;
     }
 }
 

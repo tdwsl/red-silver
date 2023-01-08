@@ -1,6 +1,8 @@
 #include "draw.hpp"
 #include "map.hpp"
 #include "images.hpp"
+#include "path.hpp"
+#include "alinit.hpp"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 
@@ -15,6 +17,17 @@ void drawBitmap(ALLEGRO_BITMAP *b, int cx, int cy, int cw, int ch,
     al_draw_scaled_bitmap(b, cx, cy, cw, ch,
                           dx*g_scale, dy*g_scale,
                           cw*g_scale, ch*g_scale, 0);
+}
+
+void drawTintedBitmap(ALLEGRO_BITMAP *b, ALLEGRO_COLOR col,
+                      int cx, int cy, int cw, int ch, int dx, int dy)
+{
+    if(dx < 0) { cw += dx; cx -= dx; dx = 0; }
+    if(dy < 0) { ch += dy; cy -= dy; dy = 0; }
+    if(cw < 0 || ch < 0) return;
+    al_draw_tinted_scaled_bitmap(b, col, cx, cy, cw, ch,
+                                 dx*g_scale, dy*g_scale,
+                                 cw*g_scale, ch*g_scale, 0);
 }
 
 void drawText(const char *s, int x, int y) {
@@ -46,8 +59,8 @@ void drawMap(int xo, int yo) {
         case 1:
             t = 0;
             for(int d = 0; d < 4; d++) {
-                int x = g_dirs4[d*2] + i % g_mapw;
-                int y = g_dirs4[d*2+1] + i / g_mapw;
+                int x = g_dirs[d*2] + i % g_mapw;
+                int y = g_dirs[d*2+1] + i / g_mapw;
                 if(!inMapBounds(x, y)) continue;
                 int j = y*g_mapw+x;
                 if(joinsWall(g_map[y*g_mapw+x])) t |= 1 << d;
@@ -67,3 +80,16 @@ void drawMap(int xo, int yo) {
                    (i % g_mapw)*16+xo, (i / g_mapw)*16+yo);
     }
 }
+
+void drawPath(int xo, int yo, int ap, int ap2) {
+    for(unsigned long i = 0; i < g_mapw*g_maph; i++) {
+        if(g_pathMap[i] == 255 || g_pathMap[i] <= 1) continue;
+        int sx = 32;
+        if(g_pathMap[i]*2 > ap) sx = 48;
+        if(g_pathMap[i]*2 > ap2) continue;
+        drawTintedBitmap(b_ui, al_map_rgba(128, 128, 128, 128),
+                         32, 0, 16, 16,
+                         (i%g_mapw)*16+xo, (i/g_mapw)*16+yo);
+    }
+}
+

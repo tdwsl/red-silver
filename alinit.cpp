@@ -23,6 +23,7 @@ void initAl() {
     al_hide_mouse_cursor(g_disp);
 
     al_register_event_source(g_queue, al_get_keyboard_event_source());
+    al_register_event_source(g_queue, al_get_mouse_event_source());
     al_register_event_source(g_queue, al_get_display_event_source(g_disp));
     al_register_event_source(g_queue, al_get_timer_event_source(g_timer));
 
