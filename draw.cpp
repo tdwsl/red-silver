@@ -85,10 +85,10 @@ void drawPath(int xo, int yo, int ap, int ap2) {
     for(unsigned long i = 0; i < g_mapw*g_maph; i++) {
         if(g_pathMap[i] == 255 || g_pathMap[i] <= 1) continue;
         int sx = 32;
-        if(g_pathMap[i]*2 > ap) sx = 48;
-        if(g_pathMap[i]*2 > ap2) continue;
+        if(g_pathMap[i] > ap) sx = 48;
+        if(g_pathMap[i] > ap2) continue;
         drawTintedBitmap(b_ui, al_map_rgba(128, 128, 128, 128),
-                         32, 0, 16, 16,
+                         sx, 0, 16, 16,
                          (i%g_mapw)*16+xo, (i/g_mapw)*16+yo);
     }
 }

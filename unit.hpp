@@ -1,5 +1,7 @@
 #pragma once
 
+#define UNIT_SPEED 2
+
 class Unit {
     char xo = 0, yo = 0;
     int counter;

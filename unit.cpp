@@ -29,14 +29,19 @@ void Unit::draw(int xo, int yo, bool dn) {
 void Unit::update() {
     switch(mode) {
     case MODE_WALKING:
-        if(xo < 0) xo--;
-        else if(xo > 0) xo++;
-        if(yo < 0) yo--;
-        else if(yo > 0) yo++;
+        if(xo < 0) xo -= UNIT_SPEED;
+        else if(xo > 0) xo += UNIT_SPEED;
+        if(yo < 0) yo -= UNIT_SPEED;
+        else if(yo > 0) yo += UNIT_SPEED;
 
         if(xo >= 16 || yo >= 16 || xo <= -16 || yo <= -16) {
             x += xo/16;
             y += yo/16;
+            xo = 0;
+            yo = 0;
+        }
+
+        if(xo == 0 && yo == 0) {
             if(g_pathMap[y*g_mapw+x] == 1)
                 mode = MODE_NORMAL;
             else {
@@ -44,6 +49,8 @@ void Unit::update() {
                 backtrack(xx, yy);
                 xo = xx-x;
                 yo = yy-y;
+                if(xo && yo) ap -= 3;
+                else ap -= 2;
             }
         }
         break;

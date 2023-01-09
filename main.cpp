@@ -15,7 +15,7 @@
 int g_cx = 0, g_cy = 0;
 int g_camX = 0, g_camY = 0;
 int g_playerTeam = Unit::TEAM_RED;
-Unit *g_selected = 0;
+Unit *g_sel = 0;
 
 unsigned char g_map1[] = {
     15,15,
@@ -48,8 +48,8 @@ void draw() {
     for(int i = 0; i < g_nunits; i++)
         g_units[i]->draw(-g_camX, -g_camY, sw);
 
-    if(g_selected && g_selected->mode == Unit::MODE_NORMAL)
-        drawPath(-g_camX, -g_camY, g_selected->ap-10, g_selected->ap);
+    if(g_sel && g_sel->mode == Unit::MODE_NORMAL)
+        drawPath(-g_camX, -g_camY, g_sel->ap-10, g_sel->ap);
 
     drawBitmap(b_ui, 16, 0, 16, 16, (g_cx*16)-g_camX, (g_cy*16)-g_camY);
 
@@ -66,17 +66,33 @@ void draw() {
 }
 
 void mouseClick() {
-    if(g_selected && g_selected->mode == Unit::MODE_WALKING) return;
+    if(g_sel && g_sel->mode == Unit::MODE_WALKING) return;
 
     Unit *u = unitAt(g_cx, g_cy);
     if(!u) {
-        if(!g_selected) return;
+        if(!g_sel) return;
+
+        if(g_pathMap[g_sel->y*g_mapw+g_sel->x] >= g_sel->ap
+           || g_pathMap[g_cy*g_mapw+g_cx] == 255)
+        {
+            g_sel = 0;
+            return;
+        }
+
+        generatePath(g_cx, g_cy);
+        if(g_pathMap[g_sel->y*g_mapw+g_sel->x] == 0) {
+            generatePath(g_sel->x, g_sel->y);
+            return;
+        }
+
+        g_sel->mode = Unit::MODE_WALKING;
+
         return;
     }
 
     if(u->team != g_playerTeam) return;
 
-    g_selected = u;
+    g_sel = u;
     generatePath(u->x, u->y);
 }
 
@@ -96,13 +112,17 @@ void update() {
     else if(ms.y >= h-SCROLL_ZONE) g_camY += CAM_SPEED;
     clamp(g_camX, -(w/g_scale)/2, g_mapw*16-(w/g_scale)/2);
     clamp(g_camY, -(h/g_scale)/2, g_maph*16-(h/g_scale)/2);
+
+    for(int i = 0; i < g_nunits; i++)
+        g_units[i]->update();
 }
 
 int main() {
     initAl();
     loadImages();
     loadMapArr(g_map1);
-    Unit player = Unit(1, 1, Unit::TEAM_RED);
+    Unit u1 = Unit(1, 1, Unit::TEAM_RED);
+    Unit u2 = Unit(2, 1, Unit::TEAM_RED);
 
     bool quit = false;
     while(!quit) {
