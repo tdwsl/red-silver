@@ -84,11 +84,10 @@ void drawMap(int xo, int yo) {
 void drawPath(int xo, int yo, int ap, int ap2) {
     for(unsigned long i = 0; i < g_mapw*g_maph; i++) {
         if(g_pathMap[i] == 255 || g_pathMap[i] <= 1) continue;
-        int sx = 32;
-        if(g_pathMap[i] > ap) sx = 48;
+        ALLEGRO_COLOR col = al_map_rgba(128, 255, 128, 128);
+        if(g_pathMap[i] > ap) col = al_map_rgba(200, 255, 128, 128);
         if(g_pathMap[i] > ap2) continue;
-        drawTintedBitmap(b_ui, al_map_rgba(128, 128, 128, 128),
-                         sx, 0, 16, 16,
+        drawTintedBitmap(b_ui, col, 32, 0, 16, 16,
                          (i%g_mapw)*16+xo, (i/g_mapw)*16+yo);
     }
 }

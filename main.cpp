@@ -5,6 +5,7 @@
 #include "draw.hpp"
 #include "util.hpp"
 #include "unit.hpp"
+#include "fov.hpp"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <stdio.h>
@@ -48,10 +49,27 @@ void draw() {
     for(int i = 0; i < g_nunits; i++)
         g_units[i]->draw(-g_camX, -g_camY, sw);
 
-    if(g_sel && g_sel->mode == Unit::MODE_NORMAL)
-        drawPath(-g_camX, -g_camY, g_sel->ap-10, g_sel->ap);
+    // draw fog
+    ALLEGRO_COLOR fcol = al_map_rgba(128, 128, 128, 128);
+    for(unsigned long i = 0; i < g_mapw*g_maph; i++)
+        if(!g_fovMap[i])
+            drawTintedBitmap(b_ui, fcol, 48, 0, 16, 16,
+                             (i%g_mapw)*16-g_camX, (i/g_mapw)*16-g_camY);
 
-    drawBitmap(b_ui, 16, 0, 16, 16, (g_cx*16)-g_camX, (g_cy*16)-g_camY);
+    if(g_sel && g_sel->mode == Unit::MODE_NORMAL) {
+        drawPath(-g_camX, -g_camY, g_sel->ap-10, g_sel->ap);
+        int x = g_cx, y = g_cy;
+        if(!pathBlocked(g_pathMap[y*g_mapw+x], g_sel->ap))
+            do {
+                backtrackh(x, y);
+                drawBitmap(b_ui, 16, 0, 16, 16, x*16-g_camX, y*16-g_camY);
+            } while(x != g_sel->x || y != g_sel->y);
+        else
+            drawBitmap(b_ui, 16, 0, 16, 16,
+                       g_sel->x*16-g_camX, g_sel->y*16-g_camY);
+    }
+
+    drawBitmap(b_ui, 16, 0, 16, 16, g_cx*16-g_camX, g_cy*16-g_camY);
 
     char buf[200];
     sprintf(buf, "%d %d", -g_camX, -g_camY);
@@ -72,8 +90,8 @@ void mouseClick() {
     if(!u) {
         if(!g_sel) return;
 
-        if(g_pathMap[g_sel->y*g_mapw+g_sel->x] >= g_sel->ap
-           || g_pathMap[g_cy*g_mapw+g_cx] == 255)
+        char t = g_pathMap[g_cy*g_mapw+g_cx];
+        if(!t || t > g_sel->ap || t == 255)
         {
             g_sel = 0;
             return;
@@ -85,12 +103,16 @@ void mouseClick() {
             return;
         }
 
-        g_sel->mode = Unit::MODE_WALKING;
+        g_sel->walk(g_cx, g_cy);
 
         return;
     }
 
     if(u->team != g_playerTeam) return;
+    if(u == g_sel) {
+        g_sel = 0;
+        return;
+    }
 
     g_sel = u;
     generatePath(u->x, u->y);

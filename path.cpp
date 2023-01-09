@@ -1,6 +1,7 @@
 #include "path.hpp"
 #include "map.hpp"
-//#include <stdio.h>
+#include "unit.hpp"
+#include "fov.hpp"
 
 unsigned char g_pathMap[MAPSZ];
 
@@ -9,10 +10,14 @@ void generatePath(int x1, int y1) {
         g_pathMap[i] = tileBlocks(g_map[i]) ? 255 : 0;
     }
 
+    for(int i = 0; i < g_nunits; i++)
+        if(g_fovMap[g_units[i]->y*g_mapw+g_units[i]->x])
+            g_pathMap[g_units[i]->y*g_mapw+g_units[i]->x] = -1;
+
     g_pathMap[y1*g_mapw+x1] = 1;
 
     for(int g = 1; g < 128; g++) {
-        for(int i = 0; i < g_mapw*g_maph; i++) {
+        for(unsigned long i = 0; i < g_mapw*g_maph; i++) {
             if(g_pathMap[i] != g) continue;
             for(int d = 0; d < 8; d++) {
                 int x = g_dirs[d*2] + i % g_mapw;
@@ -51,3 +56,27 @@ void backtrack(int &x, int &y) {
         y += g_dirs[li*2+1];
     }
 }
+
+void backtrackh(int &x, int &y) {
+    int hi = -1, hd = 0;
+    int t1 = g_pathMap[y*g_mapw+x];
+    for(int d = 0; d < 8; d++) {
+        int xx = x + g_dirs[d*2];
+        int yy = y + g_dirs[d*2+1];
+        if(!inMapBounds(xx, yy)) continue;
+        int t = g_pathMap[yy*g_mapw+xx];
+        if(t && t < t1 && t > hd) {
+            hi = d;
+            hd = t;
+        }
+    }
+    if(hi != -1) {
+        x += g_dirs[hi*2];
+        y += g_dirs[hi*2+1];
+    }
+}
+
+bool pathBlocked(int t, int ap) {
+    return (t == 0 || t > ap || t == 255);
+}
+
