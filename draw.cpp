@@ -3,6 +3,7 @@
 #include "images.hpp"
 #include "path.hpp"
 #include "alinit.hpp"
+#include "fov.hpp"
 #include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 
@@ -85,8 +86,10 @@ void drawMap(int xo, int yo) {
             t = g_map[i];
             break;
         }
-        drawBitmap(b_map, (t%8)*16, (t/8)*16, 16, 16,
-                   (i % g_mapw)*16+xo, (i / g_mapw)*16+yo);
+        ALLEGRO_COLOR col = al_map_rgba(255, 255, 255, 255);
+        if(!g_fovMap[i]) col = al_map_rgba(176, 176, 176, 255);
+        drawTintedBitmap(b_map, col, (t%8)*16, (t/8)*16, 16, 16,
+                         (i % g_mapw)*16+xo, (i / g_mapw)*16+yo);
     }
 }
 

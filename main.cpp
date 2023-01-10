@@ -50,11 +50,11 @@ void draw() {
         g_units[i]->draw(-g_camX, -g_camY, sw);
 
     // draw fog
-    ALLEGRO_COLOR fcol = al_map_rgba(128, 128, 128, 128);
+    /*ALLEGRO_COLOR fcol = al_map_rgba(128, 128, 128, 128);
     for(unsigned long i = 0; i < g_mapw*g_maph; i++)
         if(!g_fovMap[i])
             drawTintedBitmap(b_ui, fcol, 48, 0, 16, 16,
-                             (i%g_mapw)*16-g_camX, (i/g_mapw)*16-g_camY);
+                             (i%g_mapw)*16-g_camX, (i/g_mapw)*16-g_camY);*/
 
     if(g_sel && g_sel->mode == Unit::MODE_NORMAL) {
         drawPath(-g_camX, -g_camY, g_sel->ap-10, g_sel->ap);
