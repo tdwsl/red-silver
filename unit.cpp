@@ -93,7 +93,7 @@ bool Unit::sees(int x, int y) {
         int xx = Unit::x + (i*xd)/d;
         int yy = Unit::y + (i*yd)/d;
         if(xx == x && yy == y) return true;
-        if(tileBlocks(g_map[yy*g_mapw+xx])) return false;
+        if(tileBlocksVision(g_map[yy*g_mapw+xx])) return false;
     }
 
     return false;

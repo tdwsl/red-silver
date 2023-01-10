@@ -8,5 +8,6 @@ extern unsigned int g_mapw, g_maph;
 
 bool inMapBounds(int x, int y);
 bool tileBlocks(int t);
+bool tileBlocksVision(int t);
 void loadMapArr(unsigned char *m);
 

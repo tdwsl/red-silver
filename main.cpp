@@ -80,6 +80,19 @@ void draw() {
     al_get_mouse_state(&ms);
     drawBitmap(b_ui, 0, 0, 16, 16, ms.x/g_scale, ms.y/g_scale);
 
+    // ap
+    if(g_sel && g_sel->mode == Unit::MODE_NORMAL
+       && g_pathMap[g_cy*g_mapw+g_cx]
+       && g_pathMap[g_cy*g_mapw+g_cx] != 255
+       && !(g_sel->x == g_cx && g_sel->y == g_cy)) {
+        ALLEGRO_COLOR col = al_map_rgba(255, 255, 255, 255);
+        if(pathBlocked(g_pathMap[g_cy*g_mapw+g_cx], g_sel->ap))
+            col = al_map_rgba(255, 128, 128, 255);
+        sprintf(buf, "-%dAP (%d)", g_pathMap[g_cy*g_mapw+g_cx]-1,
+                g_sel->ap-g_pathMap[g_cy*g_mapw+g_cx]+1);
+        drawTintedText(buf, col, ms.x/g_scale+16, ms.y/g_scale);
+    }
+
     al_flip_display();
 }
 
@@ -91,7 +104,7 @@ void mouseClick() {
         if(!g_sel) return;
 
         char t = g_pathMap[g_cy*g_mapw+g_cx];
-        if(!t || t > g_sel->ap || t == 255)
+        if(!t || t > g_sel->ap+1 || t == 255)
         {
             g_sel = 0;
             return;

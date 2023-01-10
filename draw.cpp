@@ -39,6 +39,15 @@ void drawText(const char *s, int x, int y) {
     }
 }
 
+void drawTintedText(const char *s, ALLEGRO_COLOR col, int x, int y) {
+    int xx = x;
+    for(const char *c = s; *c; c++) {
+        drawTintedBitmap(b_font, col, ((*c)%32)*8, ((*c)/32)*8, 8, 8, xx, y);
+        xx += 8;
+        if(*s == '\n') { xx = x; y++; }
+    }
+}
+
 bool joinsWall(int t) {
     return (t >= 1 && t <= 5);
 }
@@ -85,8 +94,8 @@ void drawPath(int xo, int yo, int ap, int ap2) {
     for(unsigned long i = 0; i < g_mapw*g_maph; i++) {
         if(g_pathMap[i] == 255 || g_pathMap[i] <= 1) continue;
         ALLEGRO_COLOR col = al_map_rgba(128, 255, 128, 128);
-        if(g_pathMap[i] > ap) col = al_map_rgba(200, 255, 128, 128);
-        if(g_pathMap[i] > ap2) continue;
+        if(g_pathMap[i] > ap+1) col = al_map_rgba(255, 200, 128, 128);
+        if(g_pathMap[i] > ap2+1) col = al_map_rgba(255, 128, 128, 128);;
         drawTintedBitmap(b_ui, col, 32, 0, 16, 16,
                          (i%g_mapw)*16+xo, (i/g_mapw)*16+yo);
     }

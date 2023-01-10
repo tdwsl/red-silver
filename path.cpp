@@ -58,25 +58,25 @@ void backtrack(int &x, int &y) {
 }
 
 void backtrackh(int &x, int &y) {
-    int hi = -1, hd = 0;
+    int li = -1, ld = 255;
     int t1 = g_pathMap[y*g_mapw+x];
     for(int d = 0; d < 8; d++) {
         int xx = x + g_dirs[d*2];
         int yy = y + g_dirs[d*2+1];
         if(!inMapBounds(xx, yy)) continue;
         int t = g_pathMap[yy*g_mapw+xx];
-        if(t && t < t1 && t > hd) {
-            hi = d;
-            hd = t;
+        if(t && t < ld-1 && t < t1) {
+            li = d;
+            ld = t;
         }
     }
-    if(hi != -1) {
-        x += g_dirs[hi*2];
-        y += g_dirs[hi*2+1];
+    if(li != -1) {
+        x += g_dirs[li*2];
+        y += g_dirs[li*2+1];
     }
 }
 
 bool pathBlocked(int t, int ap) {
-    return (t == 0 || t > ap || t == 255);
+    return (t == 0 || t > ap+1 || t == 255);
 }
 

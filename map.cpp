@@ -27,6 +27,15 @@ bool tileBlocks(int t) {
     }
 }
 
+bool tileBlocksVision(int t) {
+    switch(t) {
+    case 1: case 2:
+        return true;
+    default:
+        return false;
+    }
+}
+
 void loadMapArr(unsigned char *m) {
     g_mapw = *(m++);
     g_maph = *(m++);
